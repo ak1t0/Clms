@@ -8,22 +8,22 @@
   (number? exp))
 
 (defn symbol-to-function [exp]
-  (eval (symbol (name exp))))
+  (symbol (name exp)))
 
-(defn lookup-var [exp]
+(defn lookup-var [exp env]
   (if (function? (symbol-to-function exp))
     (eval (symbol-to-function exp))
-    nil))
+    (env exp)))
 
-(defn eval-rest [exp]
-  (map -eval exp))
+(defn eval-rest [exp env]
+  (map -eval exp (repeat (count exp) env)))
 
-(defn -eval [exp]
+(defn -eval [exp env]
   (if-not (vector? exp)
     (if (immediate-val? exp)
       exp
-      (lookup-var exp))
+      (lookup-var exp env))
     (let
-      [fun (-eval (first exp))
-       args (eval-rest (rest exp))]
+      [fun (-eval (first exp) env)
+       args (eval-rest (rest exp) env)]
       (apply fun args))))
