@@ -1,7 +1,7 @@
 (ns clystal.core
   (:require [clojure.test :refer [function?]]))
 
-(declare immediate-val? lookup-primitice-fun eval-list -eval)
+(declare immediate-val? lookup-var eval-list -eval)
 (declare lambda-to-exp)
 
 
@@ -18,10 +18,7 @@
 (defn key-to-function [exp]
   (symbol (name exp)))
 
-(defn lookup-var [exp env]
-  (if (function? (key-to-function exp))
-    (eval (key-to-function exp))
-    (env exp)))
+
 
 (defn eval-rest [exp env]
   (map -eval exp (repeat (count exp) env)))
@@ -32,7 +29,7 @@
       exp
       (lookup-var exp env))
     (if (unique-form? exp)
-      (lambda-to-exp exp)
+      (lambda-to-exp exp env)
       (let
         [fun (-eval (first exp) env)
          args (eval-rest (rest exp) env)]
@@ -43,8 +40,14 @@
 ;;
 ;;(-eval [:+ :x :y] {:x n :y m})
 
-(defn lambda-to-exp [lambda]
+(defn lambda-to-exp [lambda env]
   (let [exp (get (first lambda) 2)
-        env (zipmap (second (first lambda)) (rest lambda))]
-    (-eval exp env)))
+        local-env (zipmap (second (first lambda)) (rest lambda))]
+    (-eval exp (apply (partial vector local-env) env))))
 
+;;environment model [{ } { } ...]
+
+(defn lookup-var [exp env]
+  (if (function? (key-to-function exp))
+    (eval (key-to-function exp))
+    ((first env) exp)))
