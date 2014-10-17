@@ -2,7 +2,7 @@
   (:require [clojure.test :refer [function?]]))
 
 (declare immediate-val? lookup-var eval-list -eval)
-(declare lambda-to-exp)
+(declare lambda-to-exp unique-form let-to-lambda)
 
 
 (defn immediate-val? [exp]
@@ -10,9 +10,16 @@
 
 (defn unique-form? [exp]
   (let [head (first exp)]
-    (if (and (vector? head) (= (first head) :lambda))
+    (if (or
+         (and (vector? head) (= (first head) :lambda))
+         (= (first exp) :let))
       true
       false)))
+
+(defn unique-form [exp env]
+  (cond
+   (= (first exp) :let) (let-to-lambda exp env)
+   (= (first (first exp)) :lambda) (lambda-to-exp exp env)))
 
 
 (defn key-to-function [exp]
@@ -29,7 +36,7 @@
       exp
       (lookup-var exp env))
     (if (unique-form? exp)
-      (lambda-to-exp exp env)
+      (unique-form exp env)
       (let
         [fun (-eval (first exp) env)
          args (eval-rest (rest exp) env)]
@@ -43,7 +50,27 @@
 (defn lambda-to-exp [lambda env]
   (let [exp (get (first lambda) 2)
         local-env (zipmap (second (first lambda)) (rest lambda))]
-    (-eval exp (apply (partial vector local-env) env))))
+    ;exp
+    ;(apply (partial vector local-env) env)
+    (-eval exp (apply (partial vector local-env) env))
+    ))
+
+;;[:let [[:x m] [:y n]] [:+ :x :y]]
+;;
+;;[[:lambda [:x :y] [:+ :x :y] m n]
+(defn let-to-lambda [let-ex env]
+  (let [params (get let-ex 1)
+        body (get let-ex 2)
+        local-env (apply hash-map (interleave (map first params) (map second params)))]
+   (-eval
+    (into
+     (vector
+      (vector :lambda (vec (map first params)) body))
+     (map second params))
+     local-env
+     )
+  ))
+
 
 ;;environment model [{ } { } ...]
 
