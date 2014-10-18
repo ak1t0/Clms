@@ -55,6 +55,7 @@
     (-eval exp (apply (partial vector local-env) env))
     ))
 
+
 ;;[:let [[:x m] [:y n]] [:+ :x :y]]
 ;;
 ;;[[:lambda [:x :y] [:+ :x :y] m n]
@@ -70,6 +71,27 @@
      local-env
      )
   ))
+
+
+;;[:lambda [:x :y] [:+ :x :y]] env-vec
+;;
+;;[:closure [:x :y] [:+ :x :y] env-map]
+
+(defn lambda-to-closure [exp env]
+  (vector :closure (exp 1) (exp 2) (first env)))
+
+;;[:closure [:x :y] [:+ :x :y] {:x m}] [{:x a :y b}]
+;;
+;;(-eval [:+ :x :y] [{:x m :y b}])
+
+(defn closure-to-exp [closure args]
+  (let [params (closure 1)
+        body (closure 2)
+        cls-env-map (closure 3)
+        arg-env-map (apply hash-map (interleave params args))
+        new-env-map (merge arg-env-map cls-env-map)]
+    ;(list body new-env)
+    (-eval body (vector new-env-map))))
 
 
 ;;environment model [{ } { } ...]
