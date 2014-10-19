@@ -3,32 +3,8 @@
 
 (declare immediate-val? lookup-var eval-list -eval)
 (declare lambda-to-exp unique-form let-to-lambda)
-(declare lambda-to-closure closure-to-exp -apply -eval2)
-
-
-(defn immediate-val? [exp]
-  (number? exp))
-
-(defn unique-form? [exp]
-  (let [head (first exp)]
-    (or
-     (= head :lambda)
-     (= head :closure)
-     (= head :let))))
-
-(defn unique-form [exp env]
-  (cond
-   (= (first exp) :let) (let-to-lambda exp env)
-   (= (first exp) :lambda) (lambda-to-closure exp env)
-   (= (first exp) :closure) (closure-to-exp exp env)
-   ))
-
-
-(defn key-to-function [exp]
-  (symbol (name exp)))
-
-(defn eval-rest [exp env]
-  (map -eval exp (repeat (count exp) env)))
+(declare lambda-to-closure closure-to-exp )
+(declare eval-rest unique-form? key-to-function)
 
 (defn -eval [exp env]
   (if-not (vector? exp)
@@ -43,6 +19,16 @@
           (apply fun args)))))
 
 
+(defn unique-form [exp env]
+  (cond
+   (= (first exp) :let) (let-to-lambda exp env)
+   (= (first exp) :lambda) (lambda-to-closure exp env)
+   (= (first exp) :closure) (closure-to-exp exp env)))
+
+(defn eval-rest [exp env]
+  (map -eval exp (repeat (count exp) env)))
+
+
 ;;[:closure [:x :y] [:+ :x :y] {:x m}] [{:x a :y b}]]
 ;;
 ;;(-eval [:+ :x :y] [{:x m :y b}])
@@ -54,8 +40,16 @@
         new-env-map (merge (first env) cls-env-map)]
     (-eval body (vector new-env-map))))
 
+;;[:lambda]
+
 
 ;;environment model [{ } { } ...]
+;; empty env is [{}]
+
+
+
+;;util function
+;;
 
 (defn lookup-var [exp env]
   (if (function? (key-to-function exp))
@@ -63,3 +57,16 @@
     (if (= ((first env) exp) nil)
       exp
       ((first env) exp))))
+
+(defn immediate-val? [exp]
+  (not (keyword? exp)))
+
+(defn key-to-function [exp]
+  (symbol (name exp)))
+
+(defn unique-form? [exp]
+  (let [head (first exp)]
+    (or
+     (= head :lambda)
+     (= head :closure)
+     (= head :let))))
