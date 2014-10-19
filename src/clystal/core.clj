@@ -3,7 +3,7 @@
 
 (declare immediate-val? lookup-var eval-list -eval)
 (declare lambda-to-exp unique-form let-to-lambda)
-(declare lambda-to-closure closure-to-exp )
+(declare lambda-to-closure closure-to-exp)
 (declare eval-rest unique-form? key-to-function)
 
 (defn -eval [exp env]
@@ -58,6 +58,24 @@
         lambda-body (body 2)
         cls-env-map (apply hash-map (interleave params args))]
     (-eval (vector :closure params lambda-body cls-env-map) env)))
+
+
+;;[:let [[:x 3] [:y 4]] [+ :x :y]]
+;;
+;;[[:lambda [:x :y] [:+ :x :y]] 3 4]
+;;
+;;
+;;[:let [[:x m] [:y n]] [:let [[:x a] [:y b]] [:* :x :y]]]
+;;
+;;[:lambda [:x :y] [:let [[:x a] [:y b]] [* :x :y]] m n]
+
+(defn let-to-lambda [exp env]
+  (let [body (exp 2)
+        params (map first (exp 1))
+        args (map second (exp 1))]
+    ;(apply vector (vector :lambda (vec params) (vec body)) args)
+    (-eval (apply vector (vector :lambda (vec params) (vec body)) args) env)
+    ))
 
 
 ;;environment model [{ } { } ...]
