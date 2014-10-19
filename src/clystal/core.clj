@@ -20,10 +20,11 @@
 
 
 (defn unique-form [exp env]
-  (cond
-   (= (first exp) :let) (let-to-lambda exp env)
-   (= (first exp) :lambda) (lambda-to-closure exp env)
-   (= (first exp) :closure) (closure-to-exp exp env)))
+  (let [head (first exp)]
+    (cond
+     (= head :let) (let-to-lambda exp env)
+     (and (vector? head) (= (first head) :lambda)) (lambda-to-closure exp env)
+     (= head :closure) (closure-to-exp exp env))))
 
 (defn eval-rest [exp env]
   (map -eval exp (repeat (count exp) env)))
@@ -40,7 +41,23 @@
         new-env-map (merge (first env) cls-env-map)]
     (-eval body (vector new-env-map))))
 
-;;[:lambda]
+
+;;[[:lambda [:x :y] [:+ :x :y]] m n] [{:x a ;y b}]
+;;
+;;[:closure [:x :y] [:+ :x :y] {:x m :y n}]
+;;
+;;
+;;[[:lambda [:x :y] [+ :x [[:lambda [:d :e] [:+ :d :e]] f g]]] m n]
+;;
+;;[:closure [:x :y] [:+ :x :y [[:lambda [:d :e] [:+ :d :e]] f g]] {:x m :y n}]
+
+(defn lambda-to-closure [lambda env]
+  (let [body (first lambda)
+        args (rest lambda)
+        params (second body)
+        lambda-body (body 2)
+        cls-env-map (apply hash-map (interleave params args))]
+    (-eval (vector :closure params lambda-body cls-env-map) env)))
 
 
 ;;environment model [{ } { } ...]
@@ -67,6 +84,6 @@
 (defn unique-form? [exp]
   (let [head (first exp)]
     (or
-     (= head :lambda)
+     (and (vector? head) (= (first head) :lambda))
      (= head :closure)
      (= head :let))))
