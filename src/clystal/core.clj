@@ -1,10 +1,12 @@
 (ns clystal.core
-  (:require [clojure.test :refer [function?]]))
+  (:require [clojure.test :refer [function?]])
+  (:use [clojure.tools.namespace.repl :only [refresh]]))
 
 (declare immediate-val? lookup-var eval-list -eval)
 (declare lambda-to-exp unique-form let-to-lambda)
 (declare lambda-to-closure closure-to-exp)
 (declare eval-rest unique-form? key-to-function)
+(declare if-to-exp -apply)
 
 (defn -eval [exp env]
   (if-not (vector? exp)
@@ -16,7 +18,12 @@
         (let
           [fun (-eval (first exp) env)
            args (eval-rest (rest exp) env)]
-          (apply fun args)))))
+          (-apply fun args env)))))
+
+(defn -apply [fun args env]
+  (if (function? fun)
+    (apply fun args)
+    (-eval (apply vector fun args) env)))
 
 
 (defn unique-form [exp env]
@@ -24,7 +31,8 @@
     (cond
      (= head :let) (let-to-lambda exp env)
      (and (vector? head) (= (first head) :lambda)) (lambda-to-closure exp env)
-     (= head :closure) (closure-to-exp exp env))))
+     (= head :closure) (closure-to-exp exp env)
+     (= head :if) (if-to-exp exp env))))
 
 (defn eval-rest [exp env]
   (map -eval exp (repeat (count exp) env)))
@@ -57,7 +65,9 @@
         params (second body)
         lambda-body (body 2)
         cls-env-map (apply hash-map (interleave params args))]
-    (-eval (vector :closure params lambda-body cls-env-map) env)))
+    ;(vector :closure params lambda-body cls-env-map)
+    (-eval (vector :closure params lambda-body cls-env-map) env)
+    ))
 
 
 ;;[:let [[:x 3] [:y 4]] [+ :x :y]]
@@ -77,6 +87,18 @@
     (-eval (apply vector (vector :lambda (vec params) (vec body)) args) env)
     ))
 
+;;[:if [:< m n] a b] env
+;;
+;;(-eval a env)
+
+(defn if-to-exp [exp env]
+  (let [cond-exp (exp 1)
+        true-exp (exp 2)
+        false-exp (exp 3)]
+  (if (-eval cond-exp env)
+    (-eval true-exp env)
+    (-eval false-exp env))))
+
 
 ;;environment model [{ } { } ...]
 ;; empty env is [{}]
@@ -86,12 +108,24 @@
 ;;util function
 ;;
 
+
+;;lookup var
+;;
+;; :function to function
+;; :boolean to :boolean
+;; :variable to value in env
+;; :symbol to symbol
+
 (defn lookup-var [exp env]
   (if (function? (key-to-function exp))
     (eval (key-to-function exp))
-    (if (= ((first env) exp) nil)
-      exp
-      ((first env) exp))))
+    (if (or (= exp :false) (= exp :true))
+      (cond
+       (= exp :false) false
+       (= exp :true) true)
+      (if (= ((first env) exp) nil)
+        exp
+        ((first env) exp)))))
 
 (defn immediate-val? [exp]
   (not (keyword? exp)))
@@ -104,4 +138,5 @@
     (or
      (and (vector? head) (= (first head) :lambda))
      (= head :closure)
-     (= head :let))))
+     (= head :let)
+     (= head :if))))
