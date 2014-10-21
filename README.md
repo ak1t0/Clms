@@ -14,6 +14,10 @@ eval Clms expression
 
 ```clojure
 
+Clms > (-eval exp env)
+
+
+
 Clms > (-eval [:+ :x :y] [{:x 5 :y 7}])
 => 12
 
