@@ -1,3 +1,3 @@
-# Introduction to clystal
+# Introduction to Clms
 
-TODO: write [great documentation](http://jacobian.org/writing/what-to-write/)
+[documentation](https://github.com/ak1t0/Clms/blob/master/README.md)
