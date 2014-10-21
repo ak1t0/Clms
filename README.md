@@ -10,13 +10,17 @@ Run Clms
 
     $ lein repl
 
-eval Clms expression
+basic model
 
 ```clojure
 
 Clms > (-eval exp env)
 
+```
 
+eval Clms expression
+
+```clojure
 
 Clms > (-eval [:+ :x :y] [{:x 5 :y 7}])
 => 12
