@@ -15,7 +15,6 @@ basic model
 ```clojure
 
 Clms > (-eval exp env)
-
 ```
 
 eval Clms expression
