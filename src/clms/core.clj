@@ -1,4 +1,4 @@
-(ns clystal.core
+(ns clms.core
   (:require [clojure.test :refer [function?]])
   (:use [clojure.tools.namespace.repl :only [refresh]]))
 
