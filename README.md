@@ -6,9 +6,9 @@ Clms expression is Clojure vector and environment is Clojure map vector.
 
 This is for learning Scheme, not using.
 
-## Usage
+## Model
 
-Run Clms
+Run Clms core
 
     $ lein repl
 
@@ -43,6 +43,25 @@ Clms > (-eval [:let
                  [:lambda [:n] [:if [:< :n 1] 1 [:* :n [:fact [:- :n 1]]]]]]]
                [:fact 5]] [{}])
 => 120
+```
+
+## Something like parser
+
+Run Clms paser
+
+    $ rlwrap lein run
+
+```clojure
+
+Clmsi > (let ((x 4) (y 6)) (if (< x y) 0 1))
+=> 0
+
+Clmsi > (let ((x 5) (y 7)) ((lambda (x) (+ ((lambda (y) y) 2) x)) 1))
+=> 3
+
+Clmsi > (let ((fact (lambda (n) (if (< n 1) 1 (* n (fact (- n 1))))))) (fact 5))
+=> 120
+
 ```
 
 ##Reference document
