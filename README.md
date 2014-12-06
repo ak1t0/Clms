@@ -1,8 +1,10 @@
 # Clms
 
-Clms is instant micro scheme interpreter *in* Clojure.
+Clms is a instant micro subset of scheme interpreter *in* Clojure.
 
 Clms expression is Clojure vector and environment is Clojure map vector.
+
+This is for learning Scheme, not using.
 
 ## Usage
 
@@ -41,7 +43,6 @@ Clms > (-eval [:let
                  [:lambda [:n] [:if [:< :n 1] 1 [:* :n [:fact [:- :n 1]]]]]]]
                [:fact 5]] [{}])
 => 120
-
 ```
 
 ##Reference document

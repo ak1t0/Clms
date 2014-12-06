@@ -9,6 +9,7 @@
 (declare if-to-exp -apply)
 
 (defn -eval [exp env]
+  ;; -eval
   (if-not (vector? exp)
     (if (immediate-val? exp)
       exp
@@ -19,6 +20,7 @@
           [fun (-eval (first exp) env)
            args (eval-rest (rest exp) env)]
           (-apply fun args env)))))
+
 
 (defn -apply [fun args env]
   (if (function? fun)

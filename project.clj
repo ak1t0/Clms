@@ -6,6 +6,8 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/tools.namespace "0.2.7"]]
 
+
+  :main clms.parser
   :repl-options
-  {:init-ns clms.core
-   :prompt (fn [ns] (str "Clms > " ))})
+  {:init-ns clms.parser
+   :prompt (fn [ns] (str ns " > " ))})
