@@ -9,5 +9,5 @@
 
   :main clms.parser
   :repl-options
-  {:init-ns clms.parser
+  {:init-ns clms.core
    :prompt (fn [ns] (str ns " > " ))})

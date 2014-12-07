@@ -2,13 +2,35 @@
 
 Clms is a instant micro subset of scheme interpreter *in* Clojure.
 
-Clms expression is Clojure vector and environment is Clojure map vector.
-
 This is for learning Scheme, not using.
+
+## Something like parser
+
+Run clms.paser
+
+    $ (rlwrap) lein run
+
+```clojure
+
+Clmsi > (let ((x 4) (y 6)) (if (< x y) 0 1))
+;; [:let [[:x 4] [:y 6]] [:if [:< :x :y] 0 1]]
+=> 0
+
+Clmsi > (let ((x 5) (y 7)) ((lambda (x) (+ ((lambda (y) y) 2) x)) 1))
+;; [:let [[:x 5] [:y 7]] [[:lambda [:x] [:+ [[:lambda [:y] :y] 2] :x]] 1]]
+=> 3
+
+Clmsi > (let ((fact (lambda (n) (if (< n 1) 1 (* n (fact (- n 1))))))) (fact 5))
+;; [:let [[:fact [:lambda [:n] [:if [:< :n 1] 1 [:* :n [:fact [:- :n 1]]]]]]] [:fact 5]]
+=> 120
+
+```
 
 ## Model
 
-Run Clms core
+Clms expression is Clojure vector and environment is Clojure map vector.
+
+Run clms.core
 
     $ lein repl
 
@@ -45,24 +67,6 @@ Clms > (-eval [:let
 => 120
 ```
 
-## Something like parser
-
-Run Clms paser
-
-    $ rlwrap lein run
-
-```clojure
-
-Clmsi > (let ((x 4) (y 6)) (if (< x y) 0 1))
-=> 0
-
-Clmsi > (let ((x 5) (y 7)) ((lambda (x) (+ ((lambda (y) y) 2) x)) 1))
-=> 3
-
-Clmsi > (let ((fact (lambda (n) (if (< n 1) 1 (* n (fact (- n 1))))))) (fact 5))
-=> 120
-
-```
 
 ##Reference document
 * [「つくって学ぶプログラミング言語 RubyによるScheme処理系の実装」](http://tatsu-zine.com/books/scheme-in-ruby)
