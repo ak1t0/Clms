@@ -15,17 +15,12 @@ Run clms.paser
 Clmsi > (let ((x 4) (y 6)) (if (< x y) 0 1))
 => 0
 
-;; [:let [[:x 4] [:y 6]] [:if [:< :x :y] 0 1]]
-
 Clmsi > (let ((x 5) (y 7)) ((lambda (x) (+ ((lambda (y) y) 2) x)) 1))
 => 3
-
-;; [:let [[:x 5] [:y 7]] [[:lambda [:x] [:+ [[:lambda [:y] :y] 2] :x]] 1]]
 
 Clmsi > (let ((fact (lambda (n) (if (< n 1) 1 (* n (fact (- n 1))))))) (fact 5))
 => 120
 
-;; [:let [[:fact [:lambda [:n] [:if [:< :n 1] 1 [:* :n [:fact [:- :n 1]]]]]]] [:fact 5]]
 
 ```
 
