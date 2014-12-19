@@ -72,4 +72,5 @@ Clms > (-eval [:let
 
 Copyright © 2014 ak1t0
 
-Distributed under the Eclipse Public License.
+Distributed under the MIT License.
+LICENSE(http://opensource.org/licenses/mit-license.php)
