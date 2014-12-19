@@ -74,4 +74,4 @@ Copyright © 2014 ak1t0
 
 Distributed under the MIT License.
 
-LICENSE(https://github.com/ak1t0/Clms/blob/master/LICENSE)
+[LICENSE](https://github.com/ak1t0/Clms/blob/master/LICENSE)
