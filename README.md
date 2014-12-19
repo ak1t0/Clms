@@ -73,4 +73,5 @@ Clms > (-eval [:let
 Copyright © 2014 ak1t0
 
 Distributed under the MIT License.
-LICENSE(http://opensource.org/licenses/mit-license.php)
+
+LICENSE(https://github.com/ak1t0/Clms/blob/master/LICENSE)
